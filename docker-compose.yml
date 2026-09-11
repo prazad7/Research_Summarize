@@ -1,0 +1,98 @@
+# One compose file for both localhost today and the VPS later -- only the
+# .env values (and which ports are published) need to change between them.
+#
+# Services:
+#   postgres  - job/result persistence
+#   valkey    - open-source Redis-protocol store, used as the Celery broker/backend
+#   backend   - FastAPI app (REST API)
+#   worker    - same image as backend, runs the Celery worker that executes the
+#               CrewAI pipeline
+#   frontend  - React app built and served by nginx, which also reverse-proxies
+#               /api/* to the backend so the browser only talks to one origin
+#
+# Sized for light, single-user traffic (see README) -- concurrency and
+# resources are intentionally modest, not tuned for scale.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-research_summarize}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-research_summarize}
+      POSTGRES_DB: ${POSTGRES_DB:-research_summarize}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-research_summarize}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:7-alpine
+    restart: unless-stopped
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-research_summarize}:${POSTGRES_PASSWORD:-research_summarize}@postgres:5432/${POSTGRES_DB:-research_summarize}
+      CELERY_BROKER_URL: redis://valkey:6379/0
+      CELERY_RESULT_BACKEND: redis://valkey:6379/1
+      # Deterministically skip crewai's first-run tracing/telemetry consent
+      # flow (irrelevant, and unnecessary console noise in a headless worker).
+      CREWAI_TRACING_ENABLED: "false"
+    volumes:
+      - uploads:/app/data/uploads
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+
+  worker:
+    build: ./backend
+    restart: unless-stopped
+    command: celery -A app.core.celery_app worker --loglevel=info --concurrency=2
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-research_summarize}:${POSTGRES_PASSWORD:-research_summarize}@postgres:5432/${POSTGRES_DB:-research_summarize}
+      CELERY_BROKER_URL: redis://valkey:6379/0
+      CELERY_RESULT_BACKEND: redis://valkey:6379/1
+      # Deterministically skip crewai's first-run tracing/telemetry consent
+      # flow (irrelevant, and unnecessary console noise in a headless worker).
+      CREWAI_TRACING_ENABLED: "false"
+    volumes:
+      - uploads:/app/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ""
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  valkey_data:
+  uploads:

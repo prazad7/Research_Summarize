@@ -1,0 +1,36 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+backend/data/
+backend/test_uploads/
+backend/*.db
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# Uploaded/generated data
+data/
+
+# Run-skill driver: throwaway screenshots/diagnostics from driving the app,
+# not deliverables (also may contain downloaded third-party reference images).
+.claude/skills/run-research-summarize/sessions/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,10 @@
+{
+  "name": "run-research-summarize-driver",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Headless-Chromium REPL driver used by the run-research-summarize skill (chromium-cli fallback).",
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}
