@@ -32,7 +32,7 @@ python-pptx>=1.0.2
 trafilatura>=1.12.2
 beautifulsoup4>=4.12.3
 requests>=2.32.3
-youtube-transcript-api>=0.6.2
+youtube-transcript-api>=1.0.0,<2.0.0  # 1.x rewrote the API (instance methods, attribute-access transcript entries) -- youtube_extractor.py targets that shape; the old unbounded ">=0.6.2" pin let a 0.x->1.x breaking upgrade silently slip in and broke every YouTube job
 yt-dlp>=2024.8.6
 pydub>=0.25.1
 

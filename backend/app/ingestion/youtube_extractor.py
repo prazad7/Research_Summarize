@@ -65,7 +65,11 @@ class YoutubeExtractor(BaseExtractor):
             ) from exc
 
     def _fetch_transcript(self, video_id: str) -> tuple[str, str]:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        # youtube-transcript-api 1.x rewrote this as an instance API (the
+        # old YouTubeTranscriptApi.list_transcripts(video_id) classmethod
+        # is gone -- requirements.txt pins ">=0.6.2" with no upper bound,
+        # so a fresh install pulls this breaking rewrite straight in).
+        transcript_list = YouTubeTranscriptApi().list(video_id)
         try:
             transcript = transcript_list.find_transcript(["en"])
         except NoTranscriptFound:
@@ -74,7 +78,9 @@ class YoutubeExtractor(BaseExtractor):
                 transcript = transcript.translate("en")
 
         entries = transcript.fetch()
-        text = " ".join(entry["text"].strip() for entry in entries if entry["text"].strip())
+        # Same 1.x rewrite: each entry is now a FetchedTranscriptSnippet
+        # (attribute access), not the old dict (which supported ["text"]).
+        text = " ".join(entry.text.strip() for entry in entries if entry.text.strip())
         return text, f"YouTube video {video_id}"
 
     def _fallback_audio_transcription(self, job: Job, url: str, video_id: str) -> ExtractedContent:
