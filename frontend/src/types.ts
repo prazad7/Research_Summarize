@@ -13,6 +13,7 @@ export type ContentType =
   | "pdf"
   | "docx"
   | "xlsx"
+  | "csv"
   | "pptx"
   | "audio"
   | "video";
@@ -49,6 +50,15 @@ export interface JobCreateResponse {
   job_id: string;
   status: JobStatus;
   content_type: ContentType;
+}
+
+export type ChatRole = "user" | "assistant";
+
+export interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
+  created_at: string;
 }
 
 export class ApiError extends Error {

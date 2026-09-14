@@ -38,6 +38,17 @@ def test_create_job_rejects_unsupported_file_extension(client):
     assert response.status_code == 422
 
 
+def test_create_job_accepts_csv_upload(client, mocker):
+    mocker.patch("app.api.routes.jobs.process_content_job.delay")
+
+    response = client.post(
+        "/api/jobs", files={"file": ("data.csv", b"Name,Age\nAlice,30\n", "text/csv")}
+    )
+
+    assert response.status_code == 201
+    assert response.json()["content_type"] == "csv"
+
+
 def test_get_job_status_not_found(client):
     response = client.get("/api/jobs/does-not-exist")
     assert response.status_code == 404

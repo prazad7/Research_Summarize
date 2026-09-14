@@ -11,10 +11,10 @@ from crewai import LLM
 from app.config import settings
 
 
-def get_llm() -> LLM:
+def get_llm(*, temperature: float = 0.3) -> LLM:
     return LLM(
         model=f"openai/{settings.OPENAI_MODEL}",
         api_key=settings.OPENAI_API_KEY,
-        temperature=0.3,
+        temperature=temperature,
         timeout=60,  # bounds a single stalled call; Celery's task time limit bounds the whole job
     )

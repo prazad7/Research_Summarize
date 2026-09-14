@@ -32,6 +32,7 @@ def get_extractor(content_type: ContentType) -> BaseExtractor:
     # Local imports avoid pulling every extractor's (sometimes heavy)
     # dependencies until they're actually needed.
     from app.ingestion.audio_extractor import AudioExtractor
+    from app.ingestion.csv_extractor import CsvExtractor
     from app.ingestion.docx_extractor import DocxExtractor
     from app.ingestion.excel_extractor import ExcelExtractor
     from app.ingestion.pdf_extractor import PdfExtractor
@@ -46,6 +47,7 @@ def get_extractor(content_type: ContentType) -> BaseExtractor:
         ContentType.PDF: PdfExtractor,
         ContentType.DOCX: DocxExtractor,
         ContentType.XLSX: ExcelExtractor,
+        ContentType.CSV: CsvExtractor,
         ContentType.PPTX: PptxExtractor,
         ContentType.AUDIO: AudioExtractor,
         ContentType.VIDEO: VideoExtractor,

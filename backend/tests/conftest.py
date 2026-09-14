@@ -21,7 +21,6 @@ os.environ.setdefault("LOG_JSON", "false")
 os.environ.setdefault("UPLOAD_DIR", "./test_uploads")
 
 import pytest
-from fastapi.testclient import TestClient
 
 from app.db.base import Base, engine, init_db
 
@@ -41,7 +40,12 @@ def _setup_db():
 
 
 @pytest.fixture
-def client() -> TestClient:
+def client():
+    # Imported here rather than at module scope so tests that don't
+    # request this fixture (extractors, detect, error-mapping, validators)
+    # never need to import FastAPI/starlette at all.
+    from fastapi.testclient import TestClient
+
     from app.main import app
 
     return TestClient(app)

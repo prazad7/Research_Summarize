@@ -7,7 +7,7 @@ interface Props {
 }
 
 const ACCEPTED_EXTENSIONS =
-  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm";
+  ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm";
 
 export default function InputPanel({ disabled, onSubmitUrl, onSubmitFile }: Props) {
   const [url, setUrl] = useState("");
@@ -83,7 +83,7 @@ export default function InputPanel({ disabled, onSubmitUrl, onSubmitFile }: Prop
           </svg>
         </div>
         <p>Drop a file here, or click to choose one</p>
-        <p className="dropzone-hint">PDF, Word, Excel, PowerPoint, audio, or video</p>
+        <p className="dropzone-hint">PDF, Word, Excel, CSV, PowerPoint, audio, or video</p>
         <input
           ref={fileInputRef}
           type="file"

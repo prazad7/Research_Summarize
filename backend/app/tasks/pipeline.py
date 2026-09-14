@@ -8,6 +8,7 @@ the frontend, via polling) can show live progress.
 from __future__ import annotations
 
 from app.agents.crew import run_summary_crew
+from app.config import settings
 from app.core.celery_app import celery_app
 from app.db.base import session_scope
 from app.db.models import ContentType, Job, JobStatus
@@ -55,6 +56,13 @@ def process_content_job(self, job_id: str) -> None:
             job = db.get(Job, job_id)
             extractor = get_extractor(content_type)
             extracted = extractor.extract(job)
+
+        with session_scope() as db:
+            job = db.get(Job, job_id)
+            # Persisted (truncated to the same bound the crew itself sees)
+            # so the chat follow-up endpoint has real source text to ground
+            # answers in, rather than only the final summary.
+            job.extracted_text = extracted.text[: settings.TRUNCATE_CONTENT_CHARS]
 
         _set_status(job_id, JobStatus.ANALYZING, "Analyzing content...")
 

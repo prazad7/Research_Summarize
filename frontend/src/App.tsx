@@ -147,7 +147,7 @@ export default function App() {
         )}
 
         {view === "results" && job?.result && (
-          <ResultsView result={job.result} onReset={handleReset} />
+          <ResultsView jobId={job.job_id} result={job.result} onReset={handleReset} />
         )}
 
         {view === "error" && (

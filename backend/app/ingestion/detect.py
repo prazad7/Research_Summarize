@@ -20,6 +20,7 @@ _EXTENSION_MAP: dict[str, ContentType] = {
     ".docx": ContentType.DOCX,
     ".xls": ContentType.XLSX,
     ".xlsx": ContentType.XLSX,
+    ".csv": ContentType.CSV,
     ".ppt": ContentType.PPTX,
     ".pptx": ContentType.PPTX,
     ".mp3": ContentType.AUDIO,

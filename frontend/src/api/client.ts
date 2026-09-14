@@ -1,4 +1,4 @@
-import { ApiError, JobCreateResponse, JobStatusResponse } from "../types";
+import { ApiError, ChatMessage, JobCreateResponse, JobStatusResponse } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 const API_KEY_STORAGE_KEY = "research_summarize_api_key";
@@ -60,6 +60,30 @@ export async function submitFile(file: File): Promise<JobCreateResponse> {
 export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
   const response = await fetch(`${API_BASE_URL}/api/jobs/${jobId}`, {
     headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new ApiError(await parseErrorDetail(response), response.status);
+  }
+  return response.json();
+}
+
+export async function getChatMessages(jobId: string): Promise<ChatMessage[]> {
+  const response = await fetch(`${API_BASE_URL}/api/jobs/${jobId}/messages`, {
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new ApiError(await parseErrorDetail(response), response.status);
+  }
+  return response.json();
+}
+
+export async function sendChatMessage(jobId: string, message: string): Promise<ChatMessage> {
+  const response = await fetch(`${API_BASE_URL}/api/jobs/${jobId}/messages`, {
+    method: "POST",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
   });
 
   if (!response.ok) {

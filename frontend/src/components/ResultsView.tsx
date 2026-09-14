@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { JobResult } from "../types";
+import ChatPanel from "./ChatPanel";
 
 interface Props {
+  jobId: string;
   result: JobResult;
   onReset: () => void;
 }
 
-export default function ResultsView({ result, onReset }: Props) {
+export default function ResultsView({ jobId, result, onReset }: Props) {
   const [showTranscript, setShowTranscript] = useState(false);
 
   return (
@@ -72,6 +74,8 @@ export default function ResultsView({ result, onReset }: Props) {
           {showTranscript && <pre className="raw-transcript">{result.raw_transcript}</pre>}
         </section>
       )}
+
+      <ChatPanel jobId={jobId} />
 
       <button className="secondary-button" onClick={onReset}>
         Summarize something else

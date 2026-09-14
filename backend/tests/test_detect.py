@@ -29,6 +29,8 @@ def test_detect_from_url_rejects_non_http():
         ("report.pdf", ContentType.PDF),
         ("notes.docx", ContentType.DOCX),
         ("budget.xlsx", ContentType.XLSX),
+        ("legacy.xls", ContentType.XLSX),
+        ("data.csv", ContentType.CSV),
         ("deck.pptx", ContentType.PPTX),
         ("call.mp3", ContentType.AUDIO),
         ("meeting.wav", ContentType.AUDIO),
